@@ -1,65 +1,71 @@
-import Image from "next/image";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-export default function Home() {
+import SiteHeader from "./components/SiteHeader";
+import Footer from "./components/Footer";
+import Hero from "./components/Hero";
+import CategoryGrid from "./components/CategoryGrid";
+import ProductGrid from "./components/ProductGrid";
+import { prisma } from "@/lib/prisma";
+
+export default async function HomePage() {
+  const products = await prisma.product.findMany({
+    take: 8,
+    orderBy: { createdAt: "desc" },
+    where: { status: "ACTIVE" },
+    include: {
+      images: { orderBy: { sortOrder: "asc" }, take: 1 },
+      variants: { orderBy: { priceCents: "asc" }, take: 1 },
+    },
+  });
+
+  const cards = products.map((p) => ({
+    id: p.id,
+    handle: p.handle,
+    title: p.title,
+    vendor: p.vendor,
+    imageUrl: p.images[0]?.url ?? null,
+    priceCents: p.variants[0]?.priceCents ?? null,
+    currency: p.variants[0]?.currency ?? "usd",
+  }));
+
+  const featured = cards.slice(0, 4);
+  const newArrivals = cards;
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <div className="min-h-dvh bg-black text-white">
+      <SiteHeader />
+
+      <main className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-8">
+        <Hero />
+        <CategoryGrid />
+
+        <ProductGrid title="Featured" products={featured} />
+        <ProductGrid title="New arrivals" products={newArrivals} />
+
+        <section className="grid gap-3 md:grid-cols-3">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <div className="text-white font-medium">Purpose-built materials</div>
+            <div className="mt-1 text-sm text-white/60">
+              Durable fabrics and reinforced stress points where it counts.
+            </div>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <div className="text-white font-medium">Clean, tactical design</div>
+            <div className="mt-1 text-sm text-white/60">
+              Functional details without looking “costume tactical”.
+            </div>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <div className="text-white font-medium">Ready for scale</div>
+            <div className="mt-1 text-sm text-white/60">
+              Prisma + Postgres foundation for catalog, orders, and fulfillment.
+            </div>
+          </div>
+        </section>
       </main>
+
+      <Footer />
     </div>
   );
 }
