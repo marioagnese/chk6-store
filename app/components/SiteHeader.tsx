@@ -14,8 +14,8 @@ export default function SiteHeader() {
             <Image
               src="/brand/chk6-logo.png"
               alt="CHK6"
-              width={36}
-              height={36}
+              width={86}
+              height={86}
               priority
               className="h-9 w-9 rounded-md object-contain"
             />
