@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export default function SiteHeader() {
@@ -9,8 +10,18 @@ export default function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-3 py-3">
-          <Link href="/" className="font-semibold tracking-wide text-white">
-            CHK6<span className="text-white/60"> STORE</span>
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/brand/chk6-logo.png"
+              alt="CHK6"
+              width={36}
+              height={36}
+              priority
+              className="h-9 w-9 rounded-md object-contain"
+            />
+            <span className="font-semibold tracking-wide text-white">
+              CHK6<span className="text-white/60"> STORE</span>
+            </span>
           </Link>
 
           <nav className="hidden items-center gap-4 text-sm text-white/80 md:flex">
